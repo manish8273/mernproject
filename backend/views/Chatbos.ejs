@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<style>
+  .get_messages {
+    cursor: pointer;
+  }
+
+  span.converstion-box {
+    text-align: center;
+    color: #613a76;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 25px;
+  }
+
+  #online {
+    color: #88c46e;
+  }
+
+  #offline {
+    color: #d60000;
+  }
+
+  .button__badge {
+    background-color: #fa3e3e;
+    border-radius: 5px;
+    color: white;
+
+    padding: 1px 3px;
+    font-size: 10px;
+  }
+</style>
+
+<!-- head -->
+<%- include("../partials/header")%>
+
+<body>
+  <div id="app">
+    <div class="main-wrapper">
+      <!-- navbar -->
+      <%- include("../partials/navbar")%>
+
+      <!--End navbar -->
+
+      <!-- Sidebar -->
+      <%- include("../partials/sidebar")%>
+      <!--End Sidebar -->
+
+      <!-- Main Content -->
+      <div class="main-content">
+        <section class="section">
+          <div class="section-header">
+            <h1>Chat Box</h1>
+            <div class="section-header-breadcrumb">
+              <div class="breadcrumb-item active"><a href="/dashboard">Dashboard</a></div>
+            </div>
+          </div>
+
+          <div class="section-body">
+            <h2 class="section-title">Chat with Users</h2>
+            <p class="section-lead">Chat start first from user then thay appear in chat listing </p>
+
+            <div class="row align-items-center justify-content-center">
+              <div class="col-12 col-sm-6 col-lg-4">
+                <div class="card">
+                  <div class="card-header">
+                    <h4>Chat Listing</h4>
+                  </div>
+                  <div class="card-body">
+                    <ul class="list-unstyled list-unstyled-border" id="listing_chat">
+
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <div class="col-12 col-sm-6 col-lg-8">
+                <div class="card chat-box" id="mychatbox">
+                  <div class="card-header">
+                    <h2 style="color: #88c46e;" id="headername">Please select User</h2>
+                  </div>
+
+                  <div class="card-body chat-content">
+
+                  </div>
+                  <span class="converstion-box">Open a conversation for chat</span>
+                  <div class="card-footer chat-form">
+                    <form action="#" id="chat-form">
+
+
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+      </div>
+
+      </section>
+    </div>
+    <!-- <footer> -->
+    <%- include("../partials/footer")%>
+    <!-- </footer> -->
+
+  </div>
+  </div>
+</body>
+
+</html>
+<!-- // working on Chat  -->
+
+<script>
+  $(document).on('keyup #message', function(e) {
+    // alert('1111')
+    console.log(e);
+    if ($("#message").val().length !== 0) {
+      // alert('123');
+      document.getElementById('msgType').value = 0;
+      document.getElementById('submit').style.display = 'block';
+      document.getElementById('inpfile').style.display = 'none';
+    } else {
+      document.getElementById('submit').style.display = 'none';
+      document.getElementById('inpfile').style.display = 'flex';
+    }
+  });
+
+  function fileSelected(input) {
+
+    var file = input.files[0];
+    console.log(file, ">>>>>>>>>>>>>>>>>>>>>>ggggg>>>>>>>>>>>>>>>>>>>>>>>>>");
+    const formData = new FormData()
+    formData.append('file', file)
+
+
+    $.ajax({
+      type: "POST",
+      url: "/api/fileUpload_image",
+      data: formData,
+      processData: false,
+      contentType: false,
+      success: function(response) {
+        console.log(response);
+        document.getElementById('message').value = response;
+
+      },
+      error: function(response) {
+        console.log(response);
+      }
+
+    });
+
+    document.getElementById('msgType').value = 1;
+    document.getElementById('message').disabled = true;
+    document.getElementById('inpfile').style.display = 'none';
+    document.getElementById('submit').style.display = 'block';
+
+  }
+
+  function openAttachment() {
+    document.getElementById('attachment').click();
+  }
+ 
+  let session_status = {
+    "session": "<%-session.user.id%>",
+  }
+
+  let data2 = {
+    "user_id": "<%-session.user.id%>",
+    "user_type": "admin"
+  }
+  socket.emit('connect_user', data2);
+  // listing on Chat // 
+  var listing_data = {
+    "sender_id": "<%-session.user.id%>",
+    "sender_type": "admin"
+  }
+
+
+  socket.emit('chat_listing', listing_data);
+  socket.on("chat_listing_respones", chat_listing => {
+
+
+    console.log(chat_listing, ">>>>>>>>>>>>>>>mahavir>>>>>>>>fdg>>>>>>");
+
+    let html = ``;
+    for (let i in chat_listing.listing) {
+      let image = `${window.location.origin}/images/${chat_listing.listing[i].profileImage}`;
+      // let image = `/images/${chat_listing.listing[i].profileImage}`;
+      console.log('====image', image)
+
+
+      html += `<li class="media get_messages" data-id="${chat_listing.listing[i].other_user_id}">
+              <img alt="image" class="mr-3 rounded-circle" width="50" src="/images/${chat_listing.listing[i].image}">
+
+
+              <div class="media-body">
+                 
+                <div class="container">
+                  <div class="row">
+                    <div class="col">${chat_listing.listing[i].name}<br>
+                      ${(chat_listing.listing[i].lastMsg.length > 10) ? chat_listing.listing[i].lastMsg.substring(0, 10) + '...' : chat_listing.listing[i].lastMsg}</div>
+                   
+                    <div class="col">${chat_listing.listing[i].status===1 ? '<span id="online"><h4>Online</h4></span>' :'<span id="offline"><h4>Offline</h4></span>' 
+                    }
+                    <div class="col">${chat_listing.listing[i].unread_msg===0 ? '' : `<span class="button__badge"> ${chat_listing.listing[i].unread_msg}</span>` }</div>
+
+                   </div>
+                  
+                  </div>
+                </div>
+               </div>
+
+            </li>`
+
+    }
+    $('#listing_chat').html(html)
+  });
+
+  $(document).on('click', 'body .get_messages', function() {
+
+    var chatSendButton = ` <textarea type="text" class="form-control col-lg-8" placeholder="Type a message" id="message" />
+      <input type="hidden" id="msgType" name="msgType" value="0">
+	 		<input type="hidden" id="extension" name="extension" value="">
+      <input type="hidden" id="chatreciever" class="form-control" > 
+      <div class="right_up">
+        <div class="up_load" id="inpfile">
+          <input class="btn-btn-primary" accept="image/*" type="file" id="attachment"  onchange="fileSelected(this)" /> 
+          <i id="btnAttachment"  onclick="openAttachment()" class="fas fa-paperclip"></i> 
+          <i name="file"  style="margin-left:6px;" class="btn btn-primary">upload</i>
+        </div>
+        
+        <button class="btn btn-primary" id="submit" style="display:none;">
+          <i class="far fa-paper-plane"></i>
+        </button>
+
+      </div>`
+
+    $('.chat-form').html(chatSendButton);
+    $('.converstion-box').hide()
+    $(".chat-content").animate({
+      scrollTop: $(document).height() + 1000000000000000000000
+    }, "fast");
+    let receiverId = $(this).attr("data-id");
+    $('#chatreciever').val(receiverId)
+
+    var read_data = {
+      "sender_id": "<%-session.user.id%>",
+      "receiver_id": receiverId,
+      "receiver_type": "user",
+      "sender_type": "admin"
+
+    }
+
+    socket.emit('cont_unread_msg', read_data);
+
+    var get_message_data = {
+      "sender_id": "<%-session.user.id%>",
+      "sender_type": "admin",
+      "receiver_id": receiverId,
+      "receiver_type": "user"
+    }
+
+    socket.emit('message_listing', get_message_data);
+
+
+    var listing_data = {
+      "sender_id": "<%-session.user.id%>",
+      "sender_type": "admin"
+    }
+
+    ///////////////////////////////////////////////////////////
+
+    socket.emit('chat_listing', listing_data);
+
+
+  });
+
+  // $("#submit").click(function(){
+  $(document).on('click', 'body #submit', function() {
+    document.getElementById('submit').style.display = 'none';
+    document.getElementById('inpfile').style.display = 'flex';
+
+    var message = $('#message').val()
+    var chatrecieverId = $('#chatreciever').val()
+    var senderId = "<%-session.user.id%>"
+    // alert(chatrecieverId)
+    // alert(message)
+    let getMsgType = document.getElementById('msgType').value;
+    let extension = document.getElementById('extension').value;
+    var message_data = {
+      "sender_id": senderId,
+      "receiver_id": chatrecieverId,
+      "sender_type": "admin",
+      "receiver_type": "user",
+      "message": message,
+      "msg_type": getMsgType,
+      "extension": extension,
+    }
+    $('#message').val('')
+
+    document.getElementById('message').disabled = false;
+
+    socket.emit('send_message', message_data);
+    socket.on('send_message', function(data) {
+      var get_message_data = {
+        "sender_id": senderId,
+        "sender_type": "admin",
+        "receiver_id": chatrecieverId,
+        "receiver_type": "user",
+        // "msg_type": 1
+      }
+      socket.emit('message_listing', get_message_data);
+      $(".chat-content").animate({
+        scrollTop: $(document).height() + 1000000000000000000000
+      }, "fast");
+      var listing_data = {
+        "sender_id": senderId,
+        "sender_type": "admin",
+      }
+      socket.emit('chat_listing', listing_data);
+    });
+
+  })
+
+  socket.on("message_listings", response => {
+
+    let html = ``;
+    let html2 = ``;
+    let image = `${window.location.origin}/images/${response.listing[0].sender_image}`;
+    let adminId = "<%-session.user.id%>";
+
+    var name = response.listing[0].sender_name
+
+    html2 += `<img alt="image" class="mr-3 rounded-circle" width="50" src="${image}">${name}`
+    for (let i in response.listing) {
+      let m = moment(response.listing[i].createdAt).fromNow();
+
+      if (response.listing[i].sender_type == 'admin') {
+
+        let imgChat = '';
+        if (response.listing[i].msg_type == 1) {
+          imgChat = `
+          <a href="/images/${response.listing[i].message}" download="${response.listing[i].message}"><img src="/images/${response.listing[i].message}" style="width:100px; height:100px;"></a>`
+        } else {
+          imgChat = `<div class="chat-text" style="white-space: pre-line"; >${response.listing[i].message}</div>`
+        }
+
+        html += `<div class="chat-item chat-right" style="">
+          <div class="chat-details">
+            ${imgChat}
+            <div class="chat-time">${m}</div>
+          </div>
+        </div>`;
+
+      } else {
+        let imgChat = '';
+        if (response.listing[i].msg_type == 1) {
+          imgChat = `<a href="/images/${response.listing[i].message}" download="${response.listing[i].message}"><img src="/images/${response.listing[i].message}" style="width:100px; height:100px;"></a>`
+        } else {
+          imgChat = `<div class="chat-text" style="white-space: pre-line";>${response.listing[i].message}</div>`
+        }
+        html += `<div class="chat-item chat-left" style="">
+          <div class="chat-details">
+            ${imgChat}
+            <div class="chat-time">${m}</div>
+          </div>
+        </div>`;
+      }
+    }
+
+    $("#headername").html(html2);
+    $(".chat-content").html(html);
+
+  });
+</script>
