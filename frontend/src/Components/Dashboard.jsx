@@ -47,7 +47,7 @@ export function Dashboard() {
   >
     <h1>Dashboard</h1>
   </div>
-  {adminInfo?.role === 1 ? (
+  {adminInfo?.role === 0 ? (
     <div className="container-fluid">
       <div className="row">
         <Link

@@ -24,7 +24,7 @@ const Login = () => {
         const adminProfile = res.data.user;
         localStorage.setItem("adminProfile", JSON.stringify(adminProfile));
 
-        if (adminProfile.role === 1) {
+        if (adminProfile.role === 0) {
           navigate("/Dashboard");
           toast.success("Employee Login Successfully");
         } else {

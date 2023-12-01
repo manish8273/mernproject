@@ -33,8 +33,8 @@ const userSchema = new mongoose.Schema(
         role: {
             type: Number,
             enum: {
+                employee: 0,
                 manager: 1,
-                employee: 2,
             },
         },
         

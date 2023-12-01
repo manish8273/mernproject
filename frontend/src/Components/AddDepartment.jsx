@@ -21,7 +21,7 @@ const AddDepartment = () => {
   };
 
   const addTask = () => {
-    if (adminInfo?.role !== 2) {
+    if (adminInfo?.role !== 1) {
       toast.error("You do not have permission to Add Department.");
       return;
     }

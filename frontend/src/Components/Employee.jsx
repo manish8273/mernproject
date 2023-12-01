@@ -60,7 +60,7 @@ const Employee = () => {
   };
 
   const deleteHandler = (id) => {
-    if (adminInfo?.role !== 2) {
+    if (adminInfo?.role !== 1) {
       toast.error("You do not have authorization to delete.", {
         position: "top-right",
         autoClose: 3000,

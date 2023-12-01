@@ -44,7 +44,7 @@ const UpdateEmployee = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (adminInfo?.role !== 2) {
+    if (adminInfo?.role !== 1) {
         toast.error("You do not have permission to update employee information.");
         return;
       }

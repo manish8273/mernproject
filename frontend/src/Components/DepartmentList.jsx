@@ -38,7 +38,7 @@ const DepartmentList = () => {
   }, []);
 
   const deleteHandler = (id) => {
-    if (adminInfo?.role !== 2) {
+    if (adminInfo?.role !== 1) {
       toast.error("You do not have authorization to delete.", {
         position: "top-right",
         autoClose: 3000,
@@ -114,7 +114,7 @@ const DepartmentList = () => {
       <div className="section-header">
         <h1>Task List</h1>
       </div>
-      {adminInfo?.role === 1 && (
+      {adminInfo?.role === 0 && (
         <div className="text-right">
           <Link
             to={`/adddepartment`}
@@ -142,7 +142,7 @@ const DepartmentList = () => {
                     <td>{index + 1}</td>
                     <td>{userData.department_name}</td>
                     <td>
-                      {adminInfo?.role === 1 && (
+                      {adminInfo?.role === 0 && (
                         <>
                           <Link
                             to={`/departupdate/${userData._id}`}

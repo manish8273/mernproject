@@ -88,7 +88,7 @@ module.exports = {
       return helper.success(res, "SignUp Successfully", createUser);
 
     } catch (error) {
-      console.log(error)
+     return helper.error(res,error)
     }
   },
 
@@ -181,7 +181,7 @@ return helper.success(res,"Update Profile Success",update)
       };
       const nonRequired = {
         deviceToken: req.body.deviceToken,
-        role: 1,
+       
       };
 
       const getdata = await helper.vaildObject(required, nonRequired, res);
@@ -226,13 +226,9 @@ return helper.success(res,"Update Profile Success",update)
 
       // Assign the token to the user object
       user.token = token;
-      if (user.role === 1) {
-        res.json({ code: 200, message: "User Login SuccessFully", user: user });
-      } else {
-        res.json({ code: 200, message: "Admin Login Successfully", user: user });
-      }
+     return helper.success(res,"Login Success",user)
     } catch (error) {
-      console.log(error);
+     return helper.error(res,error)
     }
   },
 
@@ -308,14 +304,14 @@ return helper.success(res,"Update Profile Success",update)
       });
       return helper.success(res, "Updated Password Successfully", updatedUser)
     } catch (error) {
-      console.log(error);
+      return helper.error(res,error)
     }
   },
 
   employee_list: async(req,res)=>{
     try {
       const find_details =  await db.find({
-        role:1
+        role:0
       }) 
       return helper.success(res,"Get All Employee Details",find_details)
     } catch (error) {

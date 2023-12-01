@@ -15,7 +15,7 @@ module.exports = {
     employee_list: async(req,res)=>{
         try {
           const find_details =  await db.find({
-            role:1
+            role:0
           }) 
           return helper.success(res,"Get All Employee Details",find_details)
         } catch (error) {

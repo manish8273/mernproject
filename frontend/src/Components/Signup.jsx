@@ -24,9 +24,9 @@ const Signup = () => {
         const adminProfile = res.data.body;
         localStorage.setItem("adminProfile", JSON.stringify(adminProfile));
 
-        if (adminProfile.role === 1) {
+        if (adminProfile.role === 0) {
           toast.success("Employee Signup Successfully");
-        } else if (adminProfile.role === 2) {
+        } else if (adminProfile.role === 1) {
           toast.success("Manager Signup Successfully");
         }
 
@@ -198,8 +198,8 @@ const Signup = () => {
       required=""
       autoFocus=""
     >
-      <option value="1">Employee</option>
-      <option value="2">Manager</option>
+      <option value="0">Employee</option>
+      <option value="1">Manager</option>
     </select>
   </div>
   <div className="invalid-feedback">Please select your Role</div>
