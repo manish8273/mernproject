@@ -198,8 +198,8 @@ const Signup = () => {
       required=""
       autoFocus=""
     >
-      <option value="1">Manager</option>
-      <option value="2">Employee</option>
+      <option value="1">Employee</option>
+      <option value="2">Manager</option>
     </select>
   </div>
   <div className="invalid-feedback">Please select your Role</div>

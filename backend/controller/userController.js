@@ -88,7 +88,7 @@ module.exports = {
       return helper.success(res, "SignUp Successfully", createUser);
 
     } catch (error) {
-      console.log(error);
+      console.log(error)
     }
   },
 

@@ -115,18 +115,21 @@ const Login = () => {
               </div>
 
               <div className="form-group text-right">
-                <button
-                  onClick={login}
-                  type="submit"
-                  className="btn btn-primary btn-lg btn-icon icon-right w-100"
-                  tabIndex="4"
-                >
-                  Login
-                </button>
-              </div>
-              <div className="text-center mt-5 text-small">
-              <Link to="/signup">Go to Signup Page</Link>
-            </div>
+  <button
+    onClick={login}
+    type="submit"
+    className="btn btn-primary btn-lg btn-icon icon-right w-100"
+    tabIndex="4"
+  >
+    Login
+  </button>
+  <p className="mt-3 text-center text-small" style={{ color: 'black' }}>
+    Don't have an account? <Link to="/signup">Go to Signup Page</Link>
+  </p>
+</div>
+
+
+              
               {error && (
                 <div className="text-danger mt-3">{error}</div>
               )}

@@ -32,12 +32,19 @@ const userSchema = new mongoose.Schema(
 
         role: {
             type: Number,
-            enum: [1, 2],
-        }, //,1=manager,2-employees
+            enum: {
+                manager: 1,
+                employee: 2,
+            },
+        },
+        
        
         gender: {
             type: Number,
-            enum: [1, 2],
+            enum: {
+                male:1,
+                female: 2,
+            },
         }, //,1-male,2-female,
 
         age: {

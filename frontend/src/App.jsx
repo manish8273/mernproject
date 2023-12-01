@@ -16,21 +16,22 @@ import Signup from "./Components/Signup";
 import ViewEmployee from "./Components/ViewEmployee";
 
 function App() {
-    const adminInfo = JSON.parse(localStorage.getItem("adminProfile"));
-    const navigate = useNavigate();
+    // const adminInfo = JSON.parse(localStorage.getItem("adminProfile"));
+    // const navigate = useNavigate();
 
-    useEffect(() => {
-        if (!adminInfo) {
-            // If the token does not exist, redirect the user to the login page
-            navigate('/');
-        }
-    }, [adminInfo, navigate]);
+    // useEffect(() => {
+    //     if (!adminInfo) {
+    //         // If the token does not exist, redirect the user to the login page
+    //         navigate('/');
+    //     }
+    // }, [adminInfo, navigate]);
 
     return (
         <>
             <Routes>
+            <Route path="/signup" element={<Signup />} />
                 <Route index element={<Login />} />
-                <Route path="/signup" element={<Signup />} />
+           
                 <Route path="/" element={<AdminLayout />}>
                     <Route path="/dashboard" element={<Dashboard />} />
                     <Route path="/changepassword" element={<ChangePassword />} />
