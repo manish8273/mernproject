@@ -1,0 +1,95 @@
+/* ... Previous CSS rules ... */
+
+/* Adjust the message styling */
+.message {
+    display: flex;
+    justify-content: flex-end; /* Sent messages on the right */
+    align-items: flex-start; /* Align messages at the top */
+    width: 80%;
+    margin-bottom: 25px;
+    margin-top: 25px;
+    max-width: fit-content;
+  }
+  
+  .message img {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    object-fit: cover;
+    object-position: top;
+  }
+  
+  .message .msg {
+    width: 100%;
+    padding: 0px 0px;
+    position: relative;
+  }
+  
+  .message-options {
+    position: absolute;
+    top: 30px;
+    width: fit-content;
+    right: 0;
+    background-color: white;
+    border-radius: 10px;
+    padding: 10px;
+    z-index: 10;
+    border: 1px solid #ddd;
+  }
+  
+  .message .msg p {
+    margin: 0;
+    padding: 15px 15px;
+    background-color: #f57d2f;
+    color: white;
+    font-size: 14px;
+    border-radius: 0 10px 10px 10px;
+    width: fit-content;
+    position: relative;
+    min-width: 65px;
+    line-height: 18px;
+    width: 100%;
+  }
+  
+  .message .msg p small {
+    position: absolute;
+    color: rgba(0, 0, 0, 0.3);
+    bottom: -23px;
+    right: 12px !important;
+    width: 100%;
+    font-size: 12px;
+    text-align: left;
+  }
+  
+  .message .msg p i {
+    padding: 0px 0px 0px 10px;
+    font-size: 10px;
+    color: gray;
+  }
+  
+  .send {
+    margin-left: auto;
+    justify-content: flex-end; /* Sent messages on the right */
+  }
+  
+  .send .msg p {
+    margin-left: auto;
+    text-align: left;
+    background-color: white;
+    color: black;
+    border-radius: 10px 0px 10px 10px;
+    box-shadow: 0px 3px 6px #00000029;
+    overflow-wrap: break-word;
+  }
+  
+  .send .msg p small {
+    text-align: right;
+    right: 7px;
+  }
+  
+  .received.message {
+    justify-content: flex-start; /* Received messages on the left */
+  }
+  
+  /* ... Rest of your CSS ... */
+  

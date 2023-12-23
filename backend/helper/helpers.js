@@ -1,11 +1,15 @@
 
+// const { Validator } = require("node-input-validator");
+
 
 var jwt = require("jsonwebtoken");
 const secretCryptoKey = "jwtSecretKey";
-
-var db =  require("../models/User.js");
-
-
+const db = require("../models")
+// const SECRET_KEY =process.env.SECRET_KEY;
+// const PUBLISH_KEY =process.env.PUBLISH_KEY;
+var FCM = require("fcm-node");
+var serverKey = "AAAAUfhvbiw:APA91bG0Hl0Qvz5UczQVlbRzaborIleCpAylt--ahYNwlT-1me1_SDC6SVmP8payASGAu56KeoUx0xap6iw1F06HU9XWXUzw5aENPtuPOAZzzAtPee2Af7akkaak_5C1Nf8TIU6hcaBS"; // Replace with your server key here
+var fcm = new FCM(serverKey);
 module.exports={
 
 
@@ -82,7 +86,7 @@ unixTimestamp: function () {
  
 
   authenticateHeader: async function (req, res, next) {
- 
+    // console.log(req.headers, "--------in header check------------");
     const v = new Validator(req.headers, {
       secret_key: "required|string",
       publish_key: "required|string",
@@ -115,9 +119,9 @@ unixTimestamp: function () {
           return res.sendStatus(403);
         }
 
-        const existingUser = await db.findOne({
+        const existingUser = await db.users.findOne({
           
-            _id: payload.data._id,
+            id: payload.data.id,
             loginTime: payload.data.loginTime,
           
         });
@@ -130,32 +134,27 @@ unixTimestamp: function () {
           res.sendStatus(403);
         }
       });
-
     } else {
       res.sendStatus(403);
     }
   },
-
-
  verifyUser: async (req, res, next) => {
     const authHeader = req.headers.authorization;
-   
     if (authHeader) {
       const token = authHeader.split(" ")[1];
-
+      console.log("object");
       jwt.verify(token, secretCryptoKey, async (err, payload) => {
         if (err) {
           return res.sendStatus(403);
         }
-       
-        const existingUser = await db.findOne({
-          // where: {
-          
-            _id: payload.data._id,
+        console.log("object,,,,,,,,", payload.data.id);
+        const existingUser = await db.users.findOne({
+          where: {
+            id: payload.data.id,
             loginTime: payload.data.loginTime,
-          // },
+          },
         });
-       
+        console.log("existingUser,,,,,,,,,,,,,,,,,", existingUser);return
 
         // const existingUser = await users.findOne({
         //   where: {
@@ -272,21 +271,20 @@ unixTimestamp: function () {
 success: function (res, message, body = {}) {
     return res.status(200).json({
         'success': 1,
-        'status': 200,
+        'code': 200,
         'message': message,
         'body': body
     });
 },
 
-
 error: function (res, err, body = {}) {
     console.log(err, '===========================>error');
     
-    let status = (typeof err === 'object') ? (err.code) ? err.code : 400 : 400;
+    let code = (typeof err === 'object') ? (err.code) ? err.code : 400 : 400;
     let message = (typeof err === 'object') ? (err.message ? err.message : '') : err;
-    res.status(status).json({
+    res.status(code).json({
         'success': false,
-        'status': status,
+        'code': code,
         'message': message,
         'body': body
     });
@@ -304,6 +302,152 @@ error401:function(res,err,body={}){
 
 },
 
+send_emails: function(otp,email,resu) {
+        
+  try {
+      const nodemailer = require('nodemailer');
+      
+      var transporter = nodemailer.createTransport({
+        host: "sandbox.smtp.mailtrap.io",
+        port: 2525,
+        auth: {
+          user: "c6c7fa2796584c",
+          pass: "97598bd2dd3d5a"
+        }
+      });
+        
+
+          var mailOptions = {
+          from: 'test978056@gmail.co',
+          to: email,
+          subject:  'PicMash App: Forgot password',
+          html: `Hi, ${email} your otp is ${otp} please verify once and reset your password`     
+          };  
+          
+         /*  var mailOptions = {
+            from: 'test978056@gmail.co',
+            to: email,
+            subject:  'ProxApp: Forgot password',
+            template: 'forgetpassword',
+            data: {
+              email: email, 
+              otp: otp, 
+            },  
+          }; 
+           */
+          transporter.sendMail(mailOptions, function (error, info) {
+          if (error) {
+          console.log(error);
+          } else {
+          console.log(info)
+;
+          res.send('Email send');
+          }
+        });
+       return resu;
+  } catch (err) {
+    throw err;
+  }
+  },
+  sendEmail(object) {
+    try {
+        console.log("-------------------",object);
+        
+        var transporter = nodemailer.createTransport({
+          host: "sandbox.smtp.mailtrap.io",
+          port: 2525,
+          auth: {
+            user: "c6c7fa2796584c",
+            pass: "97598bd2dd3d5a"
+          }
+        });
+        var mailOptions = {
+            from: `"Transit",<${object.to}>`,
+            ...object,
+        };
+
+        console.log(mailOptions);
+        transporter.sendMail(mailOptions, function (error, info) {
+            if (error) {
+                console.log('error', error);
+            } else {
+                console.log('Email sent: ' + info.response);
+            }
+        });
+    } catch (err) {
+        throw err;
+    }
+},
+send_email: async function (get_param, req, res) {
+
+    console.log(get_param, "get_param");
+    var data = await db.users.findOne({
+        where: {
+            email: get_param.email,
+        },
+        raw: true,
+    });
+    /  console.log(data) /
+    if (data) {
+
+        var email_password_get = await this.email_password_for_gmail();
+
+        var url_data = await this.url_path(req);
+
+        let auth_data = await this.generate_auth_key();
+        await db.users.update({resetpassword_token:auth_data},{where:{
+          email:data.email
+        }})
+
+        / console.log(auth_data,"auth_data"); 
+      
+        var transport = nodemailer.createTransport({
+          host: "sandbox.smtp.mailtrap.io",
+          port: 2525,
+          auth: {
+            user: "c6c7fa2796584c",
+            pass: "97598bd2dd3d5a"
+          }
+        });
+      
+        var mailOptions = {
+
+            from: email_password_get.email_data,
+            to: get_param.email,
+            subject: 'Display Forgot Password',
+            html: 'Click here for change password <a href="' +
+                url_data +
+                "/api/reset_password/" +
+                auth_data +
+                '"> Click</a>'
+        };
+
+        transporter.sendMail(mailOptions, function (error, info) {
+            if (error) {
+                console.log(error);
+            } else {
+                console.log('Email sent: ' + info.response);
+            }
+        });
+
+        save = await db.users.update({
+            forgotPassword: auth_data,
+        }, {
+            where: {
+
+                id: data.id
+
+            }
+        });
+        507
+        return transporter;
+    } else {
+
+        let msg = 'Email not registered';
+        throw msg
+    }
+
+},
 
 
 
@@ -313,11 +457,33 @@ error401:function(res,err,body={}){
 
 
 
+sendPushNotification:(deviceToken, title, message) => {
+  try {
+    const fcm = new FCM(serverKey);
+
+    const messageData = {
+      registration_ids: Array.isArray(deviceToken) ? deviceToken : [deviceToken],
+      notification: {
+        title: title,
+        body: message,
+      },
+    };
+
+    fcm.send(messageData, function (err, response) {
+      if (err) {
+        console.error('Error sending push notification:', err);
+      } else {
+        console.log('Successfully sent with response:', response);
+      }
+    });
+  } catch (err) {
+    console.error('Error sending push notification:', err);
+    throw err;
+  }
+},
+
+}
 
 
 
-
-
-
-};
 
